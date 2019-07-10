@@ -22,7 +22,9 @@ public class ChannelMessageListener extends MessageListenerAdapter {
         if (sessions != null && !sessions.isEmpty()) {
             sessions.forEach(session -> {
                 try {
-                    session.sendMessage(new TextMessage(message.getBody()));
+                    synchronized (session) {
+                        session.sendMessage(new TextMessage(message.getBody()));
+                    }
                 } catch (IOException e) {
                     log.error(e.getMessage());
                 }

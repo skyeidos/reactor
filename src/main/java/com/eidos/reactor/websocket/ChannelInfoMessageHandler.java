@@ -2,6 +2,7 @@ package com.eidos.reactor.websocket;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -13,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class ChannelInfoMessageHandler extends TextWebSocketHandler {
-
 
 
     private static Map<Long, List<WebSocketSession>> sessionMaps = new ConcurrentHashMap<>();
@@ -32,5 +32,13 @@ public class ChannelInfoMessageHandler extends TextWebSocketHandler {
 
     public static Map<Long, List<WebSocketSession>> getSessionMaps() {
         return Collections.unmodifiableMap(sessionMaps);
+    }
+
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        for (Map.Entry<Long, List<WebSocketSession>> entry : sessionMaps.entrySet()) {
+            entry.getValue().remove(session);
+        }
     }
 }
